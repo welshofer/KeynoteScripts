@@ -1,0 +1,24 @@
+-- 
+-- All of my scripts owe a debt to Sal Soghoian - sal@mac.com
+-- Caution: Manipulatiing presenter nortes via AppleScript will 
+-- remove text styling: bold, italics, underline, color, etc. 
+-- will all be removed from the resulting text.
+--
+-- TODO: should be turned into a droplet to handle multiple decks
+-- Currenly only impacts the frontmost presentation
+--
+
+tell application "Keynote"
+	
+	tell document 1
+		-- set font name here
+		
+		set font of presenter notes of every slide to "Helvetica"
+		
+		- set text size here
+		
+		set size of presenter notes of every slide to 18
+	end tell
+end tell
+
+--
