@@ -1,0 +1,133 @@
+-- 
+-- All of my scripts owe a debt to Sal Soghoian - sal@mac.com
+-- Enter into Script Editor and export as application.
+--
+-- Accepts a drop of one or more Keynote presentations and 
+-- outputs a separate Pages document for each one containing 
+-- all of the presenter notes from each presentation.
+--
+-- Ignores skipped slides
+--
+-- Requires that Keynote and Pages are installed
+--
+
+use AppleScript version "2.4"
+use framework "Foundation"
+use scripting additions
+
+property type_list : {}
+property extension_list : {"key"}
+property typeIDs_list : {"com.apple.iwork.keynote.key", "com.apple.iwork.keynote.sffkey"}
+
+on run
+	set theseItems to (choose file of type typeIDs_list with multiple selections allowed)
+	open theseItems
+end run
+
+on open these_items
+	repeat with i from 1 to the count of these_items
+		set this_item to item i of these_items
+		set the item_info to info for this_item
+		if (folder of the item_info is true) and (package folder of item_info is false) then
+			process_folder(this_item)
+		else
+			try
+				set this_extension to the name extension of item_info
+			on error
+				set this_extension to ""
+			end try
+			try
+				set this_filetype to the file type of item_info
+			on error
+				set this_filetype to ""
+			end try
+			try
+				set this_typeID to the type identifier of item_info
+			on error
+				set this_typeID to ""
+			end try
+			if (alias of the item_info is false) and ((this_filetype is in the type_list) or (this_extension is in the extension_list) or (this_typeID is in typeIDs_list)) then
+				process_item(this_item)
+			end if
+		end if
+	end repeat
+end open
+
+on process_folder(this_folder)
+	set these_items to list folder this_folder without invisibles
+	repeat with i from 1 to the count of these_items
+		set this_item to alias ((this_folder as Unicode text) & (item i of these_items))
+		set the item_info to info for this_item
+		if (folder of the item_info is true) and (package folder of item_info is not true) then
+			process_folder(this_item)
+		else
+			try
+				set this_extension to the name extension of item_info
+			on error
+				set this_extension to ""
+			end try
+			try
+				set this_filetype to the file type of item_info
+			on error
+				set this_filetype to ""
+			end try
+			try
+				set this_typeID to the type identifier of item_info
+			on error
+				set this_typeID to ""
+			end try
+			if (alias of the item_info is false) and ((this_filetype is in the type_list) or (this_extension is in the extension_list) or (this_typeID is in typeIDs_list)) then
+				set outptPathOfHopeAndGlory to process_item(this_item)
+			end if
+		end if
+	end repeat
+end process_folder
+
+on process_item(this_item)
+	try
+		tell current application
+			set this_info to (info for this_item)
+			set documentFileName to name of this_info
+			set keynoteFileName to name of this_info
+			set documentFileExtension to name extension of this_info
+			set documentBaseName to text 1 thru -((length of documentFileExtension) + 2) of documentFileName
+		end tell
+		tell application "Keynote"
+			activate
+			open this_item
+			set combinedPresenterNotes to ((current date) as string) & return & return
+			tell the front document
+				set realSlideNumber to 1
+				set thisDocumentName to the name of it
+				set the combinedPresenterNotes to combinedPresenterNotes & "Presenter notes for: “" & thisDocumentName & "”"
+				repeat with i from 1 to the count of slides
+					tell slide i
+						if skipped is false then
+							set the combinedPresenterNotes to combinedPresenterNotes & return & return & "SLIDE " & (realSlideNumber as string) & return & presenter notes of it
+							set realSlideNumber to realSlideNumber + 1
+						end if
+					end tell
+				end repeat
+			end tell
+			close front document without saving
+		end tell
+		set combinedPresenterNotes to combinedPresenterNotes & return & return & "-----------------------------------------------------------------------------------------" & return & "Brought to you by Keynote, Pages, and the magic of AppleScript" & return & return & "Nothing follows."
+		set theFile to text 1 thru ((offset of "." in thisDocumentName) - 1) of thisDocumentName
+		
+		
+		tell application "Pages"
+			activate
+			set thisDocument to ¬
+				make new document with properties {document template:template "Blank", name:theFile}
+			tell thisDocument
+				set body text to combinedPresenterNotes
+			end tell
+		end tell
+	on error errorMessage number errorNumber
+		activate
+		display alert "There is a problem…" message errorMessage
+		error number -128
+	end try
+end process_item
+
+--
