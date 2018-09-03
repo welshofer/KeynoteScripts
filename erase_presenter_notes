@@ -1,0 +1,26 @@
+-- 
+-- All of my scripts owe a debt to Sal Soghoian - sal@mac.com
+-- This script will delete all Presenter Notes in the frontmost Keynote deck.
+-- TODO: should be turned into a droplet
+--
+
+set response to the button returned of (display dialog "This script will destroy, kill, erase, eradicate, and otherwise pullverize all Presenter Notes in the frontmost Keynote presentation. Proceed with caution." buttons {"Cancel!", "Destroy!"} default button 1 with icon caution)
+
+if response is equal to "Destroy!" then
+	
+	tell application "Keynote"
+		activate
+		if not (exists document 1) then error number -128
+		tell the front document
+			set thisDocumentName to the name of it
+			repeat with i from 1 to the count of slides
+				tell slide i
+					set presenter notes of it to ""
+				end tell
+			end repeat
+		end tell
+	end tell
+	
+end if
+
+--
