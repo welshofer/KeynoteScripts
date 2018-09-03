@@ -15,7 +15,7 @@ tell application "Keynote"
 		
 		set font of presenter notes of every slide to "Helvetica"
 		
-		- set text size here
+		-- set text size here
 		
 		set size of presenter notes of every slide to 18
 	end tell
