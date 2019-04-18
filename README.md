@@ -8,6 +8,8 @@ adjust_presenter_notes - allows you to set a font and size and then applies this
 erase_presenter_notes - erases every speaker note in the entire deck. Useful when sending a presentation to someone else and you would prefer that they not see your notes.
                         
 presenter_notes_to_pages - Exports the speaker notes of decks dropped onto it as individual Pages files (one for each Keynote file). Useful for folks who just want to review their notes, for handing off to translators, closed captionists, ASL translators, etc. Good example (thanks to Sal!) of how to deal with single file vs. package files and processing of multiple dropped files.
+
+grids - creates a grid of lines on the current slide of the frontmost Keynote deck
                           
 More to come.
 
