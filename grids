@@ -4,7 +4,7 @@
 -- these values well for a deck that is 2048x1536
 -- for a square grid, choose gridSize value that divides evenly for both width and height
 -- 
--- As with all AppleScripts I use - many thanks and most of the credit goes to Sal Sal Soghoian
+-- As with all AppleScripts I use - many thanks and most of the credit goes to Sal Soghoian
 --
 
 property gridSize : 128
