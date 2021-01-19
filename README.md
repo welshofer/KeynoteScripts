@@ -16,9 +16,7 @@ More to come.
 On the agenda: 
 
 slidewise presentation duplicator - when you want to change slide size but want to keep everything where it is now and at the same size. Includes copying of speaker notes.
-                                                   
-App Store preview screenshot generator - uses Keynote masters and Numbers file of localized text to automate the production of localized App Store preview screens.
-                                                        
+                                                                                                           
 Email Keynote script requests to welshofer@gmail.com and I'll see what I can do.                                    
                                                         
 Nothing follows…                                                       
