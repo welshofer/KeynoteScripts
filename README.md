@@ -10,6 +10,8 @@ erase_presenter_notes - erases every speaker note in the entire deck. Useful whe
 presenter_notes_to_pages - Exports the speaker notes of decks dropped onto it as individual Pages files (one for each Keynote file). Useful for folks who just want to review their notes, for handing off to translators, closed captionists, ASL translators, etc. Good example (thanks to Sal!) of how to deal with single file vs. package files and processing of multiple dropped files.
 
 grids - creates a grid of lines on the current slide of the frontmost Keynote deck
+golden_ratio_grid - draws a Golden Ratio grid using successive divisions by \u03c6
+  from the top-left corner of the current slide
                           
 More to come.
 
