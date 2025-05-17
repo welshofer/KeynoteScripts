@@ -1,0 +1,31 @@
+-- -----------------------------------------------------------------------------
+-- creates a Golden Ratio grid on the current slide of the frontmost Keynote deck
+--
+-- lines are positioned according to the Golden Ratio and use a 1 point grey stroke
+--
+-- As with all AppleScripts I use - many thanks and most of the credit goes to Sal Soghoian
+--
+property phi : 1.618034
+
+tell application "Keynote"
+    activate
+    tell document 1
+        set w to its width
+        set h to its height
+        set v1 to w / phi
+        set v2 to w - v1
+        set h1 to h / phi
+        set h2 to h - h1
+        tell current slide
+            repeat with x in {v1, v2}
+                make new line with properties {start point:{x, 0}, end point:{x, h}, reflection showing:false, stroke color:{32768, 32768, 32768}, stroke weight:1}
+            end repeat
+            repeat with y in {h1, h2}
+                make new line with properties {start point:{0, y}, end point:{w, y}, reflection showing:false, stroke color:{32768, 32768, 32768}, stroke weight:1}
+            end repeat
+        end tell
+    end tell
+end tell
+
+-- -------------------
+-- Nothing follows.
