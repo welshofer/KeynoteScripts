@@ -1,6 +1,6 @@
 -- mondrian
--- Creates a Piet Mondrian-inspired composition on the current slide of the frontmost Keynote deck
--- Draws an asymmetric grid of black lines with rectangles in red, blue, and yellow
+-- Creates a randomized Piet Mondrian-inspired composition on the current slide
+-- Each run produces a unique arrangement of black grid lines and primary-colored rectangles
 --
 -- As with all AppleScripts I use - many thanks and most of the credit goes to Sal Soghoian
 
@@ -15,14 +15,6 @@ tell application "Keynote"
 		if lw < 4 then set lw to 4
 		set hlw to round (lw / 2)
 
-		-- asymmetric grid positions
-		set x1 to round (w * 0.20)
-		set x2 to round (w * 0.55)
-		set x3 to round (w * 0.78)
-		set y1 to round (h * 0.28)
-		set y2 to round (h * 0.62)
-		set y3 to round (h * 0.82)
-
 		-- Mondrian palette (16-bit RGB)
 		set mondRed to {56283, 5654, 2570}
 		set mondBlue to {0, 13621, 41634}
@@ -30,50 +22,118 @@ tell application "Keynote"
 		set mondWhite to {64764, 63993, 61680}
 		set mondBlack to {1542, 1542, 1542}
 
+		-- ---
+		-- random number of grid lines (2-4 in each direction)
+
+		set numV to (random number from 2 to 4)
+		set numH to (random number from 2 to 4)
+
+		-- vertical line positions within non-overlapping percentage ranges
+		set vLines to {}
+		if numV = 2 then
+			set end of vLines to round (w * (random number from 15 to 40) / 100)
+			set end of vLines to round (w * (random number from 55 to 85) / 100)
+		else if numV = 3 then
+			set end of vLines to round (w * (random number from 12 to 28) / 100)
+			set end of vLines to round (w * (random number from 38 to 62) / 100)
+			set end of vLines to round (w * (random number from 72 to 88) / 100)
+		else
+			set end of vLines to round (w * (random number from 8 to 22) / 100)
+			set end of vLines to round (w * (random number from 28 to 42) / 100)
+			set end of vLines to round (w * (random number from 52 to 68) / 100)
+			set end of vLines to round (w * (random number from 76 to 92) / 100)
+		end if
+
+		-- horizontal line positions within non-overlapping percentage ranges
+		set hLines to {}
+		if numH = 2 then
+			set end of hLines to round (h * (random number from 15 to 40) / 100)
+			set end of hLines to round (h * (random number from 55 to 85) / 100)
+		else if numH = 3 then
+			set end of hLines to round (h * (random number from 12 to 28) / 100)
+			set end of hLines to round (h * (random number from 38 to 62) / 100)
+			set end of hLines to round (h * (random number from 72 to 88) / 100)
+		else
+			set end of hLines to round (h * (random number from 8 to 22) / 100)
+			set end of hLines to round (h * (random number from 28 to 42) / 100)
+			set end of hLines to round (h * (random number from 52 to 68) / 100)
+			set end of hLines to round (h * (random number from 76 to 92) / 100)
+		end if
+
+		-- ---
+		-- cell boundaries for iterating the grid
+
+		set xBounds to {0} & vLines & {w}
+		set yBounds to {0} & hLines & {h}
+		set numCols to (count of xBounds) - 1
+		set numRows to (count of yBounds) - 1
+		set totalCells to numCols * numRows
+
 		tell current slide
 
-			-- --- white background covering the full slide
-
+			-- white background covering the full slide
 			set bg to make new shape with properties {position:{0, 0}, width:w, height:h}
 			tell bg
 				set background fill type to color fill
 				set background color to mondWhite
 			end tell
 
-			-- --- colored rectangles
+			-- ---
+			-- randomly color cells (~25% chance each, at least one guaranteed)
 
-			-- red: top-left area
-			set r1 to make new shape with properties {position:{0, 0}, width:x1, height:y1}
-			tell r1
-				set background fill type to color fill
-				set background color to mondRed
-			end tell
+			set coloredCount to 0
+			repeat with row from 1 to numRows
+				repeat with col from 1 to numCols
+					set cellX to item col of xBounds
+					set cellY to item row of yBounds
+					set cellW to (item (col + 1) of xBounds) - cellX
+					set cellH to (item (row + 1) of yBounds) - cellY
 
-			-- yellow: middle far-right area
-			set yl to make new shape with properties {position:{x3, y1}, width:(w - x3), height:(y2 - y1)}
-			tell yl
-				set background fill type to color fill
-				set background color to mondYellow
-			end tell
+					-- 1-in-4 chance to color this cell
+					set shouldColor to ((random number from 1 to 4) = 1)
 
-			-- blue: lower center-left area
-			set bl to make new shape with properties {position:{x1, y2}, width:(x2 - x1), height:(y3 - y2)}
-			tell bl
-				set background fill type to color fill
-				set background color to mondBlue
-			end tell
+					if shouldColor then
+						-- weighted color pick: red 50%, blue 25%, yellow 25%
+						set pick to (random number from 1 to 4)
+						if pick = 1 or pick = 2 then
+							set cellColor to mondRed
+						else if pick = 3 then
+							set cellColor to mondBlue
+						else
+							set cellColor to mondYellow
+						end if
 
-			-- red accent: bottom-right corner
-			set r2 to make new shape with properties {position:{x3, y3}, width:(w - x3), height:(h - y3)}
-			tell r2
-				set background fill type to color fill
-				set background color to mondRed
-			end tell
+						set cs to make new shape with properties {position:{cellX, cellY}, width:cellW, height:cellH}
+						tell cs
+							set background fill type to color fill
+							set background color to cellColor
+						end tell
+						set coloredCount to coloredCount + 1
+					end if
+				end repeat
+			end repeat
 
-			-- --- black grid lines (drawn last so they sit on top)
+			-- guarantee at least one colored cell
+			if coloredCount = 0 then
+				set rCol to (random number from 1 to numCols)
+				set rRow to (random number from 1 to numRows)
+				set cellX to item rCol of xBounds
+				set cellY to item rRow of yBounds
+				set cellW to (item (rCol + 1) of xBounds) - cellX
+				set cellH to (item (rRow + 1) of yBounds) - cellY
+
+				set cs to make new shape with properties {position:{cellX, cellY}, width:cellW, height:cellH}
+				tell cs
+					set background fill type to color fill
+					set background color to mondRed
+				end tell
+			end if
+
+			-- ---
+			-- black grid lines (drawn last so they sit on top)
 
 			-- horizontal lines
-			repeat with yPos in {y1, y2, y3}
+			repeat with yPos in hLines
 				set yVal to (contents of yPos)
 				set hLine to make new shape with properties {position:{0, yVal - hlw}, width:w, height:lw}
 				tell hLine
@@ -83,7 +143,7 @@ tell application "Keynote"
 			end repeat
 
 			-- vertical lines
-			repeat with xPos in {x1, x2, x3}
+			repeat with xPos in vLines
 				set xVal to (contents of xPos)
 				set vLine to make new shape with properties {position:{xVal - hlw, 0}, width:lw, height:h}
 				tell vLine
