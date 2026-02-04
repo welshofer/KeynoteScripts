@@ -1,0 +1,100 @@
+-- mondrian
+-- Creates a Piet Mondrian-inspired composition on the current slide of the frontmost Keynote deck
+-- Draws an asymmetric grid of black lines with rectangles in red, blue, and yellow
+--
+-- As with all AppleScripts I use - many thanks and most of the credit goes to Sal Soghoian
+
+tell application "Keynote"
+	activate
+	tell document 1
+		set w to its width
+		set h to its height
+
+		-- line thickness proportional to slide width
+		set lw to round (w * 0.006)
+		if lw < 4 then set lw to 4
+		set hlw to round (lw / 2)
+
+		-- asymmetric grid positions
+		set x1 to round (w * 0.20)
+		set x2 to round (w * 0.55)
+		set x3 to round (w * 0.78)
+		set y1 to round (h * 0.28)
+		set y2 to round (h * 0.62)
+		set y3 to round (h * 0.82)
+
+		-- Mondrian palette (16-bit RGB)
+		set mondRed to {56283, 5654, 2570}
+		set mondBlue to {0, 13621, 41634}
+		set mondYellow to {63479, 55255, 3855}
+		set mondWhite to {64764, 63993, 61680}
+		set mondBlack to {1542, 1542, 1542}
+
+		tell current slide
+
+			-- --- white background covering the full slide
+
+			set bg to make new shape with properties {position:{0, 0}, width:w, height:h}
+			tell bg
+				set background fill type to color fill
+				set background color to mondWhite
+			end tell
+
+			-- --- colored rectangles
+
+			-- red: top-left area
+			set r1 to make new shape with properties {position:{0, 0}, width:x1, height:y1}
+			tell r1
+				set background fill type to color fill
+				set background color to mondRed
+			end tell
+
+			-- yellow: middle far-right area
+			set yl to make new shape with properties {position:{x3, y1}, width:(w - x3), height:(y2 - y1)}
+			tell yl
+				set background fill type to color fill
+				set background color to mondYellow
+			end tell
+
+			-- blue: lower center-left area
+			set bl to make new shape with properties {position:{x1, y2}, width:(x2 - x1), height:(y3 - y2)}
+			tell bl
+				set background fill type to color fill
+				set background color to mondBlue
+			end tell
+
+			-- red accent: bottom-right corner
+			set r2 to make new shape with properties {position:{x3, y3}, width:(w - x3), height:(h - y3)}
+			tell r2
+				set background fill type to color fill
+				set background color to mondRed
+			end tell
+
+			-- --- black grid lines (drawn last so they sit on top)
+
+			-- horizontal lines
+			repeat with yPos in {y1, y2, y3}
+				set yVal to (contents of yPos)
+				set hLine to make new shape with properties {position:{0, yVal - hlw}, width:w, height:lw}
+				tell hLine
+					set background fill type to color fill
+					set background color to mondBlack
+				end tell
+			end repeat
+
+			-- vertical lines
+			repeat with xPos in {x1, x2, x3}
+				set xVal to (contents of xPos)
+				set vLine to make new shape with properties {position:{xVal - hlw, 0}, width:lw, height:h}
+				tell vLine
+					set background fill type to color fill
+					set background color to mondBlack
+				end tell
+			end repeat
+
+		end tell
+	end tell
+end tell
+
+-- -------------------
+-- Nothing follows.
