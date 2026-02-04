@@ -82,12 +82,12 @@ tell application "Keynote"
 			-- randomly color cells (~25% chance each, at least one guaranteed)
 
 			set coloredCount to 0
-			repeat with row from 1 to numRows
-				repeat with col from 1 to numCols
-					set cellX to item col of xBounds
-					set cellY to item row of yBounds
-					set cellW to (item (col + 1) of xBounds) - cellX
-					set cellH to (item (row + 1) of yBounds) - cellY
+			repeat with r from 1 to numRows
+				repeat with c from 1 to numCols
+					set cellX to item c of xBounds
+					set cellY to item r of yBounds
+					set cellW to (item (c + 1) of xBounds) - cellX
+					set cellH to (item (r + 1) of yBounds) - cellY
 
 					-- 1-in-4 chance to color this cell
 					set shouldColor to ((random number from 1 to 4) = 1)
